@@ -2,7 +2,8 @@ machine:
   services:
     - docker
   environment:
-    IMAGE: blurrcat/alpine-python-psycopg2:${CIRCLE_TAG:latest}
+    VERSION: 1.0
+    IMAGE: blurrcat/alpine-python-psycopg2:$VERSION
 
 dependencies:
   override:
@@ -11,9 +12,7 @@ dependencies:
 
 test:
   override:
-    - docker run -v `pwd`/test.py:/test.py --net host $IMAGE python /test.py:
-        environment:
-          DATABASE_URL: postgresql://localhost/circle_test
+    - docker run -v `pwd`/test.py:/test.py --env DATABASE_URL=postgresql://localhost/circle_test --net host $IMAGE python /test.py
 
 deployment:
   hub:
