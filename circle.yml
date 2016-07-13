@@ -1,0 +1,23 @@
+machine:
+  services:
+    - docker
+  environment:
+    IMAGE: blurrcat/alpine-python-psycopg2:${CIRCLE_TAG:latest}
+
+dependencies:
+  override:
+    - docker info
+    - docker build -t $IMAGE .
+
+test:
+  override:
+    - docker run -v `pwd`/test.py:/test.py --net host $IMAGE python /test.py:
+        environment:
+          DATABASE_URL: postgresql://localhost/circle_test
+
+deployment:
+  hub:
+    branch: master
+    commands:
+      - docker login -e $DOCKER_EMAIL -u $DOCKER_USER -p $DOCKER_PASS
+      - docker push $IMAGE
